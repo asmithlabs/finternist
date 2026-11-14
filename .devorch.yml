@@ -1,11 +1,11 @@
 # devorch per-repo config (read by the devorch orchestrator on the NAS).
 # devorch workers may not edit this file; change it by PR.
 language: ruby
-# The repo starts as docs only, so every command tolerates "no Rails app yet".
+# Tests are RSpec (master spec section 2). The repo starts as docs only, so every command tolerates "no Rails app yet".
 setup: "if [ -f Gemfile ]; then bundle install && bin/rails db:prepare; fi"
-test: "if [ -x bin/rails ]; then bin/rails test; else echo 'no Rails app yet'; exit 1; fi"
+test: "if [ -f Gemfile ]; then bundle exec rspec; else echo 'no Rails app yet'; exit 1; fi"
 lint: "if [ -f Gemfile ]; then bundle exec rubocop --format json; else echo '{\"files\":[]}'; fi"
 dependency_audit: "if [ -f Gemfile.lock ]; then bundle exec bundler-audit check --update; else true; fi"
 test_db_url: "postgres://devorch:devorch-test-only@devorch-testdb/finternist_test"
-context_files: [README.md, docs/ARCHITECTURE.md, docs/MVP_SCOPE.md, docs/BUILD_BACKLOG.md]
-protected_paths: [docs/]
+context_files: [CLAUDE.md, docs/MASTER_SPEC.md, README.md]
+protected_paths: [docs/MASTER_SPEC.md]   # founder-owned; agents maintain the rest of docs/
