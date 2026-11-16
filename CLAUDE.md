@@ -9,11 +9,14 @@ This file is deliberately short. The specification lives in **[docs/MASTER_SPEC.
 
 1. `docs/MASTER_SPEC.md` — the founder's master product and engineering specification. **It wins every conflict.**
 2. `docs/` planning and architecture documents you create under it (see MASTER_SPEC §25 for the required tree).
-3. `README.md`, `docs/ARCHITECTURE.md`, `docs/MVP_SCOPE.md`, `docs/BUILD_BACKLOG.md` — earlier starter notes.
-   Where these disagree with the master spec, **the master spec is correct** and the starter note is stale.
+3. `README.md` — orientation only.
 
-Known conflicts already settled by the spec: tests are **RSpec**, not Minitest (§2); MFA belongs to the
-first identity slice (§4, §26 Phase 1); transactional email is **Mailgun** (§4).
+`docs/superseded/` holds the pre-spec starter notes. They are **not** in `context_files` and must not be
+built from; each carries a banner listing its conflicts and the few points worth carrying forward into
+the Phase 0 documents. Conflicts already settled by the spec: tests are **RSpec**, not Minitest (§2, §23);
+the first vertical slice is registration, verification, login and MFA alone (§4, §26 Phase 1, §30 step 7);
+a versioned, transparent scoring framework **is** required, it just may not be called validated (§8);
+transactional email is **Mailgun** (§4); the work is Phases 0–8, not Build 001/002/003 (§26).
 
 ## Non-negotiable rules
 
