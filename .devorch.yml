@@ -8,8 +8,11 @@ test: "if [ -f Gemfile ] && [ -d spec ]; then bundle exec rspec; else echo 'no R
 lint: "if [ -f Gemfile ]; then bundle exec rubocop --format json; else echo '{\"files\":[]}'; fi"
 dependency_audit: "if [ -f Gemfile.lock ]; then bundle exec bundler-audit check --update; else true; fi"
 test_db_url: "postgres://devorch:devorch-test-only@devorch-testdb/finternist_test"
-# The master spec and the agent guide come first: they decide everything else.
-context_files: [CLAUDE.md, docs/MASTER_SPEC.md, README.md, docs/ARCHITECTURE.md, docs/MVP_SCOPE.md, docs/BUILD_BACKLOG.md]
+# The master spec and the agent guide come first: they decide everything else. The pre-spec
+# starter notes are deliberately NOT here - they contradict the spec on the test framework, the
+# auth scope, the scoring framework and the phase ordering, and a planner that reads both has to
+# guess. They are kept, bannered, under docs/superseded/.
+context_files: [CLAUDE.md, docs/MASTER_SPEC.md, README.md]
 # Only the founder-owned documents are protected. docs/ as a whole must stay writable: MASTER_SPEC
 # section 25 requires agents to create docs/product, docs/architecture, docs/planning and the rest,
 # which is most of Phase 0's deliverable.
