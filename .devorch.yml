@@ -1,11 +1,36 @@
 # devorch per-repo config (read by the devorch orchestrator on the NAS).
 # devorch workers may not edit this file; change it by PR.
 language: ruby
-# The repo starts as docs only, so every command tolerates "no Rails app yet".
-setup: "if [ -f Gemfile ]; then bundle install && bin/rails db:prepare; fi"
-# RSpec, per MASTER_SPEC section 2. The older docs/ARCHITECTURE.md says Minitest; the spec wins.
-test: "if [ -f Gemfile ] && [ -d spec ]; then bundle exec rspec; else echo 'no Rails app yet'; exit 1; fi"
-lint: "if [ -f Gemfile ]; then bundle exec rubocop --format json; else echo '{\"files\":[]}'; fi"
+# Pre-Rails (F1-F4 are documentation only): no Rails, RSpec, database or asset commands run until
+# F5 creates bin/rails. bundle install still runs once a Gemfile exists so F5 can bootstrap.
+setup: |
+  if [ -f Gemfile ]; then bundle install; fi
+  if [ -x bin/rails ]; then
+    bin/rails db:prepare
+  else
+    echo "Pre-Rails repository: skipping Rails setup"
+  fi
+# RSpec, per MASTER_SPEC section 2 (the superseded notes say Minitest; the spec wins).
+#
+# Documentation checks: every spec/docs/*_check.sh is a plain POSIX sh script that exits non-zero
+# when a documentation acceptance criterion is not met (file exists, required section present...).
+# They run before and after Rails exists. RSpec runs only once F5 has created bin/rails.
+# Before Rails, at least one doc check must exist, so a feature cannot pass with nothing checked.
+test: |
+  set -e
+  n=0
+  for f in spec/docs/*_check.sh; do
+    [ -e "$f" ] || continue
+    n=$((n+1)); echo "== $f"; sh "$f"
+  done
+  if [ -x bin/rails ]; then
+    bundle exec rspec
+  elif [ "$n" -eq 0 ]; then
+    echo "Pre-Rails repository: no spec/docs/*_check.sh documentation checks found"; exit 1
+  else
+    echo "Pre-Rails repository: $n documentation check(s) passed; skipping RSpec"
+  fi
+lint: "if [ -x bin/rails ]; then bundle exec rubocop --format json; else echo '{\"files\":[]}'; fi"
 dependency_audit: "if [ -f Gemfile.lock ]; then bundle exec bundler-audit check --update; else true; fi"
 test_db_url: "postgres://devorch:devorch-test-only@devorch-testdb/finternist_test"
 # The master spec and the agent guide come first: they decide everything else. The pre-spec
